@@ -1166,6 +1166,15 @@ function paintSyncUI(){
 loadSync();
 paintSyncUI();
 
+/* 已经打开着 App 时，再点一次带令牌的链接也能生效 */
+window.addEventListener('hashchange', function(){
+  if((location.hash || '').indexOf('t=') > -1){
+    loadSync();
+    paintSyncUI();
+    if(sync.token) syncNow(true);
+  }
+});
+
 /* ========== 版本 / 更新 / 网络状态 ========== */
 function paintVersion(){
   var line = $('verLine');
