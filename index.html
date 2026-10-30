@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f4f6fa" />
+<title>冲刺计划 · 六级 + 考研</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="冲刺计划" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="bar-in">
+    <div class="brand">
+      <div class="logo">冲</div>
+      <div class="bt">
+        <h1>冲刺计划</h1>
+        <p id="brandSub">正在读取…</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-view="today" class="active">今日</button>
+      <button data-view="week">周视图</button>
+      <button data-view="phase">阶段计划</button>
+      <button data-view="stats">数据</button>
+      <button data-view="settings">设置</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="netBanner">📴 当前处于离线状态，记录的内容会保存在本地，联网后自动同步更新。</div>
+  <div class="banner" id="storeBanner">⚠️ 当前浏览器无法本地保存数据（可能是隐私模式），请用 Chrome / Edge 打开本文件。</div>
+
+  <!-- ============ 今日 ============ -->
+  <section class="view active" id="view-today">
+    <div class="today-grid">
+      <div class="col-main">
+        <div class="card datebar">
+          <button class="icon-btn" id="prevDay" title="前一天">‹</button>
+          <div class="dateinfo">
+            <div class="dtitle"><h2 id="dayTitle">—</h2><span class="badge" id="dayBadge" hidden>今天</span><button class="ghost mini" id="todayBtn" hidden>回到今天</button></div>
+            <p id="daySub">—</p>
+          </div>
+          <div class="datebar-act">
+            <button class="icon-btn" id="nextDay" title="后一天">›</button>
+          </div>
+        </div>
+
+        <div class="card progress-card">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" transform="rotate(-90 60 60)"></circle>
+            <text x="60" y="68" text-anchor="middle" class="ring-txt" id="ringTxt">0%</text>
+          </svg>
+          <div class="pmeta">
+            <div class="ptitle" id="pTitle">今日进度</div>
+            <div class="pnum"><b id="doneNum">0</b> / <span id="totalNum">0</span> 项</div>
+            <div class="pbar"><i id="pbarFill"></i></div>
+            <div class="phint" id="pastHint"></div>
+          </div>
+        </div>
+
+        <div class="card add-card">
+          <div class="addrow">
+            <input id="taskInput" autocomplete="off" placeholder="添加任务，例如：六级听力精听 1 篇（回车直接添加）" />
+            <select id="catSelect" title="科目"></select>
+            <input id="minsInput" type="number" min="0" step="5" value="30" title="预计分钟数" />
+            <button id="addBtn" class="primary">添加</button>
+          </div>
+          <div class="quick">
+            <span class="qlabel">快捷</span>
+            <div class="chips" id="quickChips"></div>
+            <div class="spacer"></div>
+            <button class="ghost" id="applyTpl">套用今日模板</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="listhead">
+            <h3>任务清单</h3>
+            <div class="filters" id="filters">
+              <button data-filter="all" class="active">全部</button>
+              <button data-filter="todo">未完成</button>
+              <button data-filter="done">已完成</button>
+            </div>
+          </div>
+          <ul class="tasks" id="taskList"></ul>
+          <div class="empty" id="emptyState" hidden>这一天还没有任务。<b>点上面的「快捷」</b>或输入框就能加。</div>
+        </div>
+      </div>
+
+      <aside class="col-side">
+        <div class="cd-wrap" id="cdWrap"></div>
+
+        <div class="card pomo">
+          <div class="pomo-top"><h3>专注计时</h3><span class="muted small" id="pomoCount">今日 0 次</span></div>
+          <div class="pomo-time" id="pomoTime">25:00</div>
+          <div class="pomo-bar"><i id="pomoBar"></i></div>
+          <div class="pomo-btns">
+            <button class="primary small" id="pomoStart">开始</button>
+            <button class="ghost" id="pomoReset">重置</button>
+            <div class="presets" id="pomoPresets">
+              <button class="chip" data-min="25">25</button>
+              <button class="chip" data-min="45">45</button>
+              <button class="chip" data-min="60">60</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card tips">
+          <h3 style="font-size:14px;font-weight:800;margin-bottom:4px">今日提醒</h3>
+          <p class="small muted" id="tipText">—</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ 周视图 ============ -->
+  <section class="view" id="view-week">
+    <div class="card">
+      <div class="weekhead">
+        <button class="icon-btn" id="prevWeek" title="上一周">‹</button>
+        <h2 id="weekRange">—</h2>
+        <button class="icon-btn" id="nextWeek" title="下一周">›</button>
+        <button class="ghost" id="weekToday">本周</button>
+      </div>
+      <div class="weekgrid" id="weekGrid"></div>
+      <div class="week-summary" id="weekSummary"></div>
+    </div>
+  </section>
+
+  <!-- ============ 阶段计划 ============ -->
+  <section class="view" id="view-phase">
+    <div class="card">
+      <div class="listhead" style="margin-bottom:2px">
+        <h3>从今天到 12 月 26 日</h3>
+        <span class="muted small" id="phaseHint">—</span>
+      </div>
+      <p class="small muted" style="margin-bottom:16px">四段式推进：先补短板，再上强度，然后六级收官，最后全力冲考研。每段只盯 3～5 个硬指标，别贪多。</p>
+      <div class="timeline" id="timeline"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3 style="font-size:15px;font-weight:800;margin-bottom:2px">推荐作息（周一至周五）</h3>
+      <p class="small muted" style="margin-bottom:8px">大块时间给数学/专业课，英语放在下午固定时段，晚上留给背诵和复盘。</p>
+      <div class="sched" id="sched"></div>
+    </div>
+  </section>
+
+  <!-- ============ 数据 ============ -->
+  <section class="view" id="view-stats">
+    <div class="stats" id="statTiles"></div>
+    <div class="card" style="margin-top:14px">
+      <div class="listhead" style="margin-bottom:4px"><h3>近 14 天完成情况</h3><span class="muted small">单位：项</span></div>
+      <div class="chart" id="chart"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <div class="listhead" style="margin-bottom:14px"><h3>各科目投入（已完成的预估时长）</h3></div>
+      <div id="catBars"></div>
+    </div>
+  </section>
+
+  <!-- ============ 设置 ============ -->
+  <section class="view" id="view-settings">
+    <div class="card">
+      <h3 style="font-size:15px;font-weight:800">考试日期</h3>
+      <p class="small muted">官方公告公布后请自行改成准确日期，倒计时会立刻更新。</p>
+      <div class="setrow" id="setExams"></div>
+      <div class="hr"></div>
+      <div class="switch-row">
+        <div>
+          <h3 style="font-size:15px;font-weight:800">每日模板</h3>
+          <p class="small muted">「套用今日模板」时会把下面这些任务一次性加到当天（已存在的会跳过）。</p>
+        </div>
+        <button class="ghost" id="printBtn">打印今日清单</button>
+      </div>
+      <div id="tplList" style="margin-top:12px"></div>
+      <div class="addrow" style="margin-top:6px">
+        <input id="tplInput" placeholder="新增模板任务，例如：英语作文模板默写" style="flex:1 1 240px;min-width:0;padding:10px 13px;border:1px solid var(--line);border-radius:11px;background:#fbfcfe;font-size:14px;outline:none" />
+        <select id="tplCat"></select>
+        <input id="tplMins" type="number" min="0" step="5" value="30" style="width:76px;text-align:center" />
+        <button class="ghost" id="tplAdd">添加</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3 style="font-size:15px;font-weight:800">数据备份</h3>
+      <p class="small muted">数据只存在这台电脑/这个浏览器的本地，换设备请用导出文件迁移。建议每周导出一次。</p>
+      <div class="setrow" style="margin-top:12px">
+        <button class="ghost" id="exportBtn">导出备份（.json）</button>
+        <button class="ghost" id="importBtn">导入备份</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden />
+        <div class="spacer"></div>
+        <button class="danger" id="resetBtn">清空所有数据</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3 style="font-size:15px;font-weight:800">云同步（手机 ↔ 电脑）</h3>
+      <p class="small muted">用 GitHub 账号当"账户"：两台设备填同一个令牌，数据自动合并；换手机、重装浏览器都不丢。</p>
+      <div id="syncBox" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="switch-row">
+        <div>
+          <h3 style="font-size:15px;font-weight:800">版本与更新</h3>
+          <p class="small muted" id="verLine">—</p>
+        </div>
+        <button class="ghost" id="checkUpdate">检查更新</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3 style="font-size:15px;font-weight:800">使用说明</h3>
+      <ul class="small muted" style="margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:5px">
+        <li>电脑：用 Edge / Chrome 打开；部署到网上后，地址栏点「安装」就变成桌面应用。</li>
+        <li>手机：浏览器打开同一个网址 → 菜单 → 「添加到主屏幕」（iPhone 用 Safari）。</li>
+        <li>每天打开「今日」，点「套用今日模板」，再按当天情况增删；做完一项点左边的圈。</li>
+        <li>昨天的任务没做完？点日期旁的 ‹ 回到昨天，会出现「顺延到今天」按钮。</li>
+        <li>换设备、换浏览器前，记得先在上面导出备份。</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
